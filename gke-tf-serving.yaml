@@ -1,0 +1,87 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    ksonnet.io/managed: '{"pristine":"H4sIAAAAAAAA/5RSTWsbMRC992fMede7SpNABDmUFkwvxZf2EowZa8dbUUmjSrPbGLP/vYwdEhN66e0xevPx3tMJMPsfVKrnBBboWSgprt1s9iRooIFfPg1g4QvlwMdISaCBSIIDCoI9QcA9haoIcwYL8djKoa1UZp9G7a+cEsnKc+c4Zk464j1taSBhpPf1dtYL9KVmdPo80AGnINpQMzldKxRzQCHF/3PY/Kp7NrAsDRTKwTusYM3bdMdJ0CcqFezTCbCMCqBtC1XZYfa7zEUeH/q+hwbaNvJAYacnPwpVuartsdIuo/x8HKvtOhd4GlocC84o7UCRO3N3+2DuP97c38G2Accxonr/BN1US7f3qdN8uBwC/9ldhqocKkr3EUd16I3SvWi1ZmVuVn075gleeJsphA0H745g4evhG8umUL2E+68goAGVefHg1ZINFwGr0pet2ld5Ko7OlgcfvZyRyxNYuD3/mshFF96uve6Z/eBx5Th2epk15wh+T1SvG811o1n7c1KV3FS8HD9zEnoWZR/quvCUwZq+7xsoU/pUv1cql8KybJdlWT78BQAA//8BAAD//8OkN9TxAgAA"}'
+  creationTimestamp: 2019-02-09T22:34:03Z
+  generation: 1
+  labels:
+    app: my-tf-serving
+    app.kubernetes.io/deploy-manager: ksonnet
+    ksonnet.io/component: my-tf-serving
+  name: my-tf-serving-v1
+  namespace: default
+  resourceVersion: "180100"
+  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/my-tf-serving-v1
+  uid: cdb6f265-2cba-11e9-a0a2-42010a800022
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: my-tf-serving
+      version: v1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: my-tf-serving
+        version: v1
+    spec:
+      containers:
+      - args:
+        - --rest_api_port=9000
+        - --model_name=${MODEL_NAME}
+        - --model_base_path=gs://${BUCKET}/${FOLDER}
+        command:
+        - /usr/bin/tensorflow_model_server
+        image: tensorflow/serving:1.12.0-gpu
+        imagePullPolicy: IfNotPresent
+        name: my-tf-serving
+        ports:
+        - containerPort: 9000
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "4"
+            memory: 6Gi
+            nvidia.com/gpu: "1"
+          requests:
+            cpu: "1"
+            memory: 2Gi
+        securityContext:
+          runAsUser: 1000
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: 2019-02-09T22:34:03Z
+    lastUpdateTime: 2019-02-09T22:34:03Z
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: 2019-02-09T22:34:03Z
+    lastUpdateTime: 2019-02-10T18:16:11Z
+    message: ReplicaSet "my-tf-serving-v1-68849d57b4" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 5
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+
